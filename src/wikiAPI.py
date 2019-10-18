@@ -2,6 +2,7 @@
 import urllib.request
 import requests
 import time
+import pickle
 
 ##Parse JSON file and get art url and title
 ## Save url to picURL
@@ -66,8 +67,44 @@ def getArtists():
 
         #time.sleep(10)
 
-    def getPaintingURLs():
-        listURL = "https://www.wikiart.org/en/api/2/PaintingsByArtist?id="
+# populates imageURLs set with painting URLs (TODO: change to dict() with title as keys)
+def getPaintingURLs():
+    listURL = "https://www.wikiart.org/en/api/2/PaintingsByArtist?id="
+    paginatedURL = ""
+    hasMore = True
+    paginationToken = ""
+    for id in artistIDs:
+        while hasMore:
+            # get page of list of artists
+            request = requests.get(listURL + id + paginatedURL).text
+
+            # update hasMore
+            request = request.split("\"hasMore\":")
+
+            # break if end of list
+            if len(request) < 2:
+                break
+
+            if request[1] == "true}":
+                hasMore = True
+            else:
+                hasMore = False
+
+            # update pagination token
+            request = request[0].split("\"paginationToken\":")
+            paginationToken = request[1].strip("\",")
+
+            # update URL
+            paginatedURL = "&paginationToken=" + paginationToken
+
+            # add to set of URLs
+            request = request[0].split("\"height\":")
+            for artist in request:
+                artist = artist.split("\"image\":")
+                if artist[-2] == "]":
+                    continue
+                #id = artist[-26:-2]
+                imageURLs.add(id)
 
 
 
@@ -80,7 +117,7 @@ def getArtists():
 
 
 getArtists()
-print(artistIDs)
+getPaintingURLs()
 
 
 # list of mediums to include:
