@@ -54,8 +54,8 @@ def getArtists():
         request = request[0].split("\"paginationToken\":")
         paginationToken = request[1].strip("\",")
 
-        print(request)
-        print(paginationToken)
+        #print(request)
+        #print(paginationToken)
 
 
         # update URL
@@ -69,7 +69,7 @@ def getArtists():
             id = artist[-26:-2]
             artistIDs.add(id)
 
-        # time.sleep(10)
+        time.sleep(10)
 
 # populates imageURLs set with painting URLs
 def getPaintingURLs():
@@ -81,8 +81,6 @@ def getPaintingURLs():
     # Set default token to empty string
     paginationToken = ""
     for id in artistIDs:
-
-        # while hasMore = true
         while hasMore:
             # get page of list of artists
             request = requests.get(listURL + id + paginatedURL).text
@@ -103,27 +101,32 @@ def getPaintingURLs():
             request = request[0].split("\"paginationToken\":")
             paginationToken = request[1].strip("\",")
 
-            # update URL
+            # update URL component
             paginatedURL = "&paginationToken=" + paginationToken
-
 
             # add to set of URLs
             request = request[0].split("\"height\":")
-            for artist in request:
-                artist = artist.split("\"image\":")
-                if artist[-2] == "]":
-                    continue
-                # id = artist[-26:-2]
-                imageURLs.add(id)
+            for url in request:
 
+                url = url.split("\"image\":")
+
+                if len(url) > 1:
+                    image = url[1].strip("\",")
+                    print(image)
+                    imageURLs.add(image)
+
+            time.sleep(10)
+
+        # reset hasMore
+        hasMore = True
 
 
             # get Image URL - "image":"https://uploads.wikiart.org/Content/images/ARTIST-480x600.jpg","wikipediaUrl":
             # This should split a string twice to single out the image url
-            imageSplit = request.split('\"image\":\"')
-            linkSplit = imageSplit.split('\",\"wikipediaUrl\"')
+            # imageSplit = request.split('\"image\":\"')
+            # linkSplit = imageSplit.split('\",\"wikipediaUrl\"')
 
-            imageURLs.add(linkSplit[0])
+            # imageURLs.add(linkSplit[0])
 
             # loop through imageUrls and download each image using function above
 
