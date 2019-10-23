@@ -4,7 +4,7 @@ import requests
 import time
 import pickle
 
-##Parse JSON file and get art url and title
+## Parse JSON file and get art url and title
 ## Save url to picURL
 ## Save title to pic title
 
@@ -14,6 +14,7 @@ from sphinx.util import requests
 # attributes
 artistIDs = set()
 imageURLs = set()
+progress = 0
 
 picURL = 'https://uploads1.wikiart.org/images/gerhard-richter/abstract-painting-780-1.jpg!Large.jpg'
 # Folder to save image to
@@ -28,12 +29,16 @@ def getImage(picURL, picPath, picTitle):
     urllib.request.urlretrieve(picURL, finalPath)
 
 def getArtists():
+    progress = 0
     # get list of artists by genre / medium and store in set
     artistsURL = "https://www.wikiart.org/en/api/2/UpdatedArtists"
     paginatedURL = ""
     hasMore = True
     paginationToken = ""
     while hasMore:
+        print(progress)
+        progress += 1
+
         # get page of list of artists
         request = requests.get(artistsURL + paginatedURL).text
 
@@ -69,10 +74,11 @@ def getArtists():
             id = artist[-26:-2]
             artistIDs.add(id)
 
-        time.sleep(10)
+        time.sleep(15)
 
 # populates imageURLs set with painting URLs
 def getPaintingURLs():
+    progress = 0
     # Main url
     listURL = "https://www.wikiart.org/en/api/2/PaintingsByArtist?id="
     paginatedURL = ""
@@ -82,6 +88,9 @@ def getPaintingURLs():
     paginationToken = ""
     for id in artistIDs:
         while hasMore:
+            print(progress)
+            progress += 1
+
             # get page of list of artists
             request = requests.get(listURL + id + paginatedURL).text
 
@@ -115,26 +124,24 @@ def getPaintingURLs():
                     print(image)
                     imageURLs.add(image)
 
-            time.sleep(10)
+            time.sleep(15)
 
         # reset hasMore
         hasMore = True
 
-
-            # get Image URL - "image":"https://uploads.wikiart.org/Content/images/ARTIST-480x600.jpg","wikipediaUrl":
-            # This should split a string twice to single out the image url
-            # imageSplit = request.split('\"image\":\"')
-            # linkSplit = imageSplit.split('\",\"wikipediaUrl\"')
-
-            # imageURLs.add(linkSplit[0])
-
-            # loop through imageUrls and download each image using function above
+def downloadImages():
+    path = "images/"
+    title = 0
+    for url in imageURLs:
+        getImage(url, path, str(title))
+        title += 1
 
 
-
+# run the script
 
 getArtists()
 getPaintingURLs()
+downloadImages()
 
 
 # list of mediums to include:
