@@ -26,7 +26,10 @@ picTitle = 'Abstract'
 def getImage(picURL, picPath, picTitle):
     finalPath = picPath + picTitle + '.jpg'
     # image = urllib.URLopener()
-    urllib.request.urlretrieve(picURL, finalPath)
+    try:
+        urllib.request.urlretrieve(picURL, finalPath)
+    except:
+        print("the one that got away: " + picURL)
 
 def getArtists():
     progress = 0
@@ -74,8 +77,6 @@ def getArtists():
             id = artist[-26:-2]
             artistIDs.add(id)
 
-        time.sleep(15)
-
 # populates imageURLs set with painting URLs
 def getPaintingURLs():
     progress = 0
@@ -91,8 +92,11 @@ def getPaintingURLs():
             print(progress)
             progress += 1
 
-            # get page of list of artists
-            request = requests.get(listURL + id + paginatedURL).text
+            try:
+                # get page of list of artists
+                request = requests.get(listURL + id + paginatedURL).text
+            except:
+                continue
 
             # update hasMore
             request = request.split("\"hasMore\":")
@@ -103,15 +107,19 @@ def getPaintingURLs():
 
             if request[1] == "true}":
                 hasMore = True
+
+                # update pagination token
+                request = request[0].split("\"paginationToken\":")
+                paginationToken = request[1].strip("\",")
+
+                # update URL component
+                paginatedURL = "&paginationToken=" + paginationToken
             else:
                 hasMore = False
 
-            # update pagination token
-            request = request[0].split("\"paginationToken\":")
-            paginationToken = request[1].strip("\",")
+                # reset paginatedURL if next request is new artist (aka no pagination token on first page)
+                paginatedURL = ""
 
-            # update URL component
-            paginatedURL = "&paginationToken=" + paginationToken
 
             # add to set of URLs
             request = request[0].split("\"height\":")
@@ -123,8 +131,6 @@ def getPaintingURLs():
                     image = url[1].strip("\",")
                     print(image)
                     imageURLs.add(image)
-
-            time.sleep(15)
 
         # reset hasMore
         hasMore = True
@@ -139,9 +145,23 @@ def downloadImages():
 
 # run the script
 
-getArtists()
+#getArtists()
+#
+#try:
+#    with open(r'D:\GAN_Gallery\artistIDs', 'wb') as file:
+#        pickle.dump(artistIDs, file)
+#except:
+#    print("oof artist ids")
+#
 getPaintingURLs()
-downloadImages()
+try:
+    with open(r'D:\GAN_Gallery\paintingURLs', 'wb') as file:
+        pickle.dump(imageURLs, file)
+        #imageURLs = pickle.load(file)
+except:
+    print("oof image URLs")
+
+#downloadImages()
 
 
 # list of mediums to include:
