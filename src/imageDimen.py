@@ -1,5 +1,8 @@
 from PIL import Image
 
+# If you run this change the start and end image numbers and the file path 
+
+
 def imageDimensions():
     # Create list to hold width, height tuple for each image
     dimensionList = []
