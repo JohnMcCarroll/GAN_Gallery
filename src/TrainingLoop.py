@@ -1,12 +1,13 @@
 import torch
-# import Generator
-# import Discriminator
+import src.Generator as G
+import src.Discriminator as D
 
-### Create/ load networks
-# G = new Generator
-# D = new Discriminator
+# Create/ load networks
+G = G.Generator()
+D = D.Discriminator()
 
 ### load in data
+
 
 ### set up optimizer functions
 # G_solver = optim.RMSprop(G.parameters(), lr=5e-5)
