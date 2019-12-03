@@ -26,23 +26,39 @@ def formatData():
         pickle.dump(dataset, file)
 
 
+for i in range(3):
 
-with open(r'D:\GAN_Gallery\src\dataset1a.db', 'rb') as file:                # Break down db files into smaller chunks if RAM issue persists
-    #pickle.dump(dataset, file)
-    dataset1 = pickle.load(file)
+    # load in data
+    if i % 3 == 0:
+        with open(r'D:\GAN_Gallery\src\dataset1a.db', 'rb') as file:
+            dataset = pickle.load(file)
+    elif i % 3 == 1:
+        with open(r'D:\GAN_Gallery\src\dataset2a.db', 'rb') as file:
+            dataset = pickle.load(file)
+    else:
+        with open(r'D:\GAN_Gallery\src\dataset3a.db', 'rb') as file:
+            dataset = pickle.load(file)
 
-# with open(r'D:\GAN_Gallery\src\dataset2.db', 'rb') as file:
-#     #pickle.dump(dataset, file)
-#     dataset2 = pickle.load(file)
+    # # reduce size
+    # index = 0
+    # for datum in dataset:
+    #     if datum.size() != torch.Size([3, 400, 400]):
+    #         dataset.pop(index)
+    #     index += 1
 
-index = 0
-for datum in dataset1:
-    if datum.size() != torch.Size([3, 400, 400]):
-        dataset1.pop(index)
-    index += 1
-
-with open(r'D:\GAN_Gallery\src\dataset1a.db', 'wb') as file:
-    pickle.dump(dataset1, file)
-
-with open(r'D:\GAN_Gallery\src\smallData.db', 'wb') as file:
-    pickle.dump(dataset1[0:101], file)
+    # save data
+    if i % 3 == 0:
+        with open(r'D:\GAN_Gallery\src\dataset1b.db', 'wb') as file:
+            pickle.dump(dataset[0:2001], file)
+        with open(r'D:\GAN_Gallery\src\dataset2b.db', 'wb') as file:
+            pickle.dump(dataset[2001:len(dataset)], file)
+    elif i % 3 == 1:
+        with open(r'D:\GAN_Gallery\src\dataset3b.db', 'wb') as file:
+            pickle.dump(dataset[0:2001], file)
+        with open(r'D:\GAN_Gallery\src\dataset4b.db', 'wb') as file:
+            pickle.dump(dataset[2001:len(dataset)], file)
+    else:
+        with open(r'D:\GAN_Gallery\src\dataset5b.db', 'wb') as file:
+            pickle.dump(dataset[0:2001], file)
+        with open(r'D:\GAN_Gallery\src\dataset6b.db', 'wb') as file:
+            pickle.dump(dataset[2001:len(dataset)], file)

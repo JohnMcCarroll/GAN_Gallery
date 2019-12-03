@@ -12,9 +12,15 @@ class Discriminator(nn.Module):
         # bias=True, padding_mode='zeros')
         self.conv1 = nn.Conv2d(3, 3, 40, 2)
         self.conv2 = nn.Conv2d(3, 3, 40, 2)
-        self.conv3 = nn.Conv2d(3, 1, 30, 2)
+        self.conv3 = nn.Conv2d(3, 3, 30, 2)
+        self.conv4 = nn.Conv2d(3, 1, 10, 2)
 
-        self.linear = nn.Linear(441,1,True)
+        self.norm1 = nn.BatchNorm2d(3)
+        self.norm2 = nn.BatchNorm2d(3)
+        self.norm3 = nn.BatchNorm2d(3)
+        self.norm4 = nn.BatchNorm2d(1)
+
+        self.linear = nn.Linear(36,1,True)
 
         # rectified linear unit
         self.linearUnit = nn.ReLU()
@@ -23,22 +29,24 @@ class Discriminator(nn.Module):
     def forward(self, inputTensor):
         # input is inputTensor
         outputTensor = self.conv1(inputTensor)
-        # fix any values to make sure they are between 0 and 1
-        outputTensor = self.linearUnit(outputTensor)
+        outputTensor = self.norm1(outputTensor)
+        #outputTensor = self.linearUnit(outputTensor)
 
         outputTensor = self.conv2(outputTensor)
-        # fix any values to make sure they are between 0 and 1
-        outputTensor = self.linearUnit(outputTensor)
+        outputTensor = self.norm2(outputTensor)
+        #outputTensor = self.linearUnit(outputTensor)
 
         outputTensor = self.conv3(outputTensor)
-        # fix any values to make sure they are between 0 and 1
-        outputTensor = self.linearUnit(outputTensor)
+        outputTensor = self.norm3(outputTensor)
+        #outputTensor = self.linearUnit(outputTensor)
 
-        outputTensor = outputTensor.reshape(outputTensor.size()[0], 1, 1, 441)
+        outputTensor = self.conv4(outputTensor)
+        outputTensor = self.norm4(outputTensor)
+        #outputTensor = self.linearUnit(outputTensor)
+
+        outputTensor = outputTensor.reshape(outputTensor.size()[0], 1, 1, 36)
 
         outputTensor = self.linear(outputTensor)
-        outputTensor = self.linearUnit(outputTensor)
-
 
         return outputTensor
 
