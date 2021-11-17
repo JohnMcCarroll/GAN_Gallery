@@ -140,10 +140,10 @@ for epoch in range(epochs * 3):
                 D_grounder.zero_grad()
 
 
-with open(r'D:\GAN_Gallery\src\D.cnn', 'wb') as file:
+with open(r'discriminator.cnn', 'wb') as file:
     pickle.dump(D, file)
 
-with open(r'D:\GAN_Gallery\src\G.cnn', 'wb') as file:
+with open(r'generator.cnn', 'wb') as file:
     pickle.dump(G, file)
 
 

@@ -1,14 +1,7 @@
-
 import urllib.request
 import requests
 import time
 import pickle
-
-## Parse JSON file and get art url and title
-## Save url to picURL
-## Save title to pic title
-
-##Url of picture
 from sphinx.util import requests
 
 # attributes
@@ -31,6 +24,7 @@ def getImage(picURL, picPath, picTitle):
     except:
         print("the one that got away: " + picURL)
 
+
 def getArtists():
     progress = 0
     # get list of artists by genre / medium and store in set
@@ -38,7 +32,7 @@ def getArtists():
     paginatedURL = ""
     hasMore = True
     paginationToken = ""
-    while hasMore:
+    while hasMore and progress < 10:          #TODO: remove***
         print(progress)
         progress += 1
 
@@ -77,6 +71,7 @@ def getArtists():
             id = artist[-26:-2]
             artistIDs.add(id)
 
+
 # populates imageURLs set with painting URLs
 def getPaintingURLs():
     progress = 0
@@ -88,7 +83,7 @@ def getPaintingURLs():
     # Set default token to empty string
     paginationToken = ""
     for id in artistIDs:
-        while hasMore:
+        while hasMore and progress < 10:     # TODO: remove**
             print(progress)
             progress += 1
 
@@ -135,6 +130,7 @@ def getPaintingURLs():
         # reset hasMore
         hasMore = True
 
+
 def downloadImages():
     path = "images/"
     title = 0
@@ -145,26 +141,26 @@ def downloadImages():
 
 # run the script
 
-#getArtists()
-#
-#try:
-#    with open(r'D:\GAN_Gallery\artistIDs', 'wb') as file:
-#        pickle.dump(artistIDs, file)
-#except:
-#    print("oof artist ids")
-#
+getArtists()
+
+try:
+   with open(r'artists.pkl', 'wb') as file:
+       pickle.dump(artistIDs, file)
+except:
+   print("oof artist ids")
+
 getPaintingURLs()
 try:
-    with open(r'D:\GAN_Gallery\paintingURLs', 'wb') as file:
+    with open(r'image_urls.pkl', 'wb') as file:
         pickle.dump(imageURLs, file)
         #imageURLs = pickle.load(file)
 except:
     print("oof image URLs")
 
-#downloadImages()
+downloadImages()
 
 
-# list of mediums to include:
-# - canvas
-# - acrylic
-# - brush?
+## Parse JSON file and get art url and title
+## Save url to picURL
+## Save title to pic title
+## Url of picture

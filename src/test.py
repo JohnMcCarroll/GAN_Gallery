@@ -1,6 +1,7 @@
 import requests
 import urllib.request
 
+
 def getauthentication():
     """fetch a session key from WikiArt"""
     params = {}
@@ -20,7 +21,9 @@ def getauthentication():
         #Logger.write('Error %s' % str(error))
         print('rip, chip')
 
+
 def getArtistList():
+    pass
 
 
 def copy_everything(self):
