@@ -19,41 +19,36 @@ D = D.Discriminator().cuda()
 trans = trans.ToPILImage()
 
 ### Set up hyperparameters
-epochs = 5
+epochs = 1
 lr = 5e-5
 counter = 0
 
 ### Training Loop
-for epoch in range(epochs * 3):
+for epoch in range(epochs * 2):
 
     ### cycle in in data
     dataset = []
     real_data = []
     gc.collect()
 
-    if epoch % 3 == 0:
-        with open(r'D:\GAN_Gallery\src\dataset1a.db', 'rb') as file:
+    if epoch % 2 == 0:
+        with open(r'dataset0.db', 'rb') as file:
             dataset = pickle.load(file)
-    elif epoch % 3 == 1:
-        with open(r'D:\GAN_Gallery\src\dataset2a.db', 'rb') as file:
-            dataset = pickle.load(file)
-    else:
-        with open(r'D:\GAN_Gallery\src\dataset3a.db', 'rb') as file:
+    elif epoch % 2 == 1:
+        with open(r'dataset0.db', 'rb') as file:
             dataset = pickle.load(file)
 
-    real_data = torch.utils.data.DataLoader(dataset, 10, True)
+    real_data = torch.utils.data.DataLoader(dataset, 10)#, True)
 
     ### set up optimizer functions
     G_solver = optim.RMSprop(G.parameters(), lr=5e-5)
     D_solver = optim.RMSprop(D.parameters(), lr=5e-5)
-    D_grounder = optim.Adam(D.parameters(), lr=2e-5)
 
     MSELoss = torch.nn.MSELoss()
 
     ### training
     iterations = 0
     for real_sample in real_data:
-
         # switch to gpu
         real_sample = real_sample.cuda()
 
@@ -73,7 +68,7 @@ for epoch in range(epochs * 3):
         D_real = D(real_sample)
         D_fake = D(G_sample)
 
-        ##what is the output ******
+        ##what is the output
         print("outputs:")
         print(D_real[0])
         print(D_fake[0])
@@ -110,7 +105,7 @@ for epoch in range(epochs * 3):
             for input in latent_space:
                 G_output = G(input)
 
-            # calculate generator adervasrial loss
+            # calculate generator adversarial loss
             G_loss = -torch.mean(D(G_output))
             print("G loss:")
             print(G_loss.item())
@@ -125,19 +120,8 @@ for epoch in range(epochs * 3):
             ### store generator image
             img = trans(G_sample[0].cpu())
             counter += 1
-            path = "D:\\GAN_Gallery\\originals\\" + str(counter) + ".jpg"
+            path = r"originals/" + str(counter) + ".jpg"
             img.save(path)
-
-            # GROUND DISCRIMINATOR              EXPERIMENTAL***
-            for j in range(0, len(real_sample)):
-                prediction = D(real_sample[j].unsqueeze(0))
-                target = torch.ones([1,1,1,1]).cuda()
-                loss = MSELoss(prediction, target)
-                print("D_ground:")
-                print(loss)
-                loss.backward()
-                D_grounder.step()
-                D_grounder.zero_grad()
 
 
 with open(r'discriminator.cnn', 'wb') as file:
@@ -145,15 +129,3 @@ with open(r'discriminator.cnn', 'wb') as file:
 
 with open(r'generator.cnn', 'wb') as file:
     pickle.dump(G, file)
-
-
-### BUGS:
-# generator has limited variability (add more layers, maybe linear layer from input to inc randomness)
-# generator might be updated during disc backprop
-# loss functions prioritize discriminator bridging gap...?
-# Gan layers/ padding might contribute to "haze" around edge
-
-### IDEAS:
-# could separate out gan update and disc update for each batch?
-# bias disc towards real data...
-# give gen linear layer from input to increase variability of output & reduce jumps between conv trans layers
